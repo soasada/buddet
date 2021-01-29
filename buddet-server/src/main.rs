@@ -4,9 +4,11 @@ use buddet_core::user::User;
 #[tokio::main]
 async fn main() {
     // GET /hello/warp => 200 OK with body "Hello, warp!"
-    let username = String::from("Nico");
-    let user = User { name: username };
-    println!("user: {}", user.name);
+    let a = String::from("");
+    let user = User::new("Firstname", "Lastname", "test@example.org", "password");
+    println!("user: {}", user);
+    let newUser = user.changePassword("newPasss");
+    println!("user: {}", newUser);
     let hello = warp::path!("hello" / String)
         .map(|name| format!("Hello, {}!", name));
 
