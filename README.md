@@ -1,0 +1,2 @@
+# buddet
+Adopt your buddy!
