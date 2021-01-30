@@ -1,24 +1,39 @@
 use std::fmt::{Display, Formatter, Result};
 
 pub struct User {
-    firstname: &'static str,
-    lastname: &'static str,
-    email: &'static str,
-    password: &'static str,
+    pub firstname: String,
+    pub lastname: String,
+    pub email: String,
+    pub password: String,
 }
 
 impl User {
-    pub fn new(firstname: &'static str, lastname: &'static str, email: &'static str, password: &'static str) -> User {
-        User { firstname, lastname, email, password }
+    pub fn new(firstname: &str, lastname: &str, email: &str, password: &str) -> User {
+        User {
+            firstname: String::from(firstname),
+            lastname: String::from(lastname),
+            email: String::from(email),
+            password: String::from(password),
+        }
     }
 
-    pub fn changePassword(&self, new: &'static str) -> User {
-        User { firstname: self.firstname, lastname: self.lastname, email: self.email, password: new }
+    pub fn change_password(&self, new: &str) -> User {
+        User {
+            firstname: self.firstname.clone(),
+            lastname: self.lastname.clone(),
+            email: self.email.clone(),
+            password: String::from(new),
+        }
     }
 }
 
 impl Display for User {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{{ \"firstname\": {}, \"lastname\": {}, \"password\": {} }}", self.firstname, self.lastname, self.password)
+        write!(f, "{{ \
+        \"firstname\": \"{}\", \
+        \"lastname\": \"{}\", \
+        \"email\": \"{}\", \
+        \"password\": \"{}\" \
+        }}", self.firstname, self.lastname, self.email, self.password)
     }
 }

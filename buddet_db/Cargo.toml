@@ -1,0 +1,10 @@
+[package]
+name = "buddet_db"
+version = "0.1.0"
+authors = ["Nicolas Vargas Ortega <nvortega92@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+buddet_core = { path = "../buddet_core", version = "0.1.0" }
+mongodb = "1.1.1"
+async-trait = "0.1.42"
