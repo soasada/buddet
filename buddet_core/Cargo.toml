@@ -1,0 +1,5 @@
+[package]
+name = "buddet_core"
+version = "0.1.0"
+authors = ["Nicolas Vargas Ortega <nvortega92@gmail.com>"]
+edition = "2018"

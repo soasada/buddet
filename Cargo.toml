@@ -1,2 +1,2 @@
 [workspace]
-members = ["buddet-core", "buddet-server"]
+members = ["buddet_core", "buddet_server"]
