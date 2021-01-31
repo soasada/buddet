@@ -1,6 +1,5 @@
 use crate::database::mongo_database::MongoDatabase;
 use mongodb::{bson::Document, bson::doc};
-use std::borrow::Borrow;
 use buddet_core::user::user::User;
 use buddet_core::user::user_repository::UserRepository;
 
