@@ -1,6 +1,8 @@
+use async_trait::async_trait;
 use crate::user::user::User;
 
-pub trait UserRepository<T> {
-    fn save(&self, persistence: &T, user: User) -> Result<String, &str>;
-    fn find(&self, persistence: &T, id: &str) -> Result<User, &str>;
+#[async_trait]
+pub trait UserRepository<'a, T> {
+    async fn save(&'a self, persistence: &T, user: User) -> Result<String, &'a str>;
+    async fn find(&'a self, persistence: &T, id: &str) -> Result<User, &'a str>;
 }

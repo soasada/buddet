@@ -1,8 +1,8 @@
 use crate::database::mongo_database::MongoDatabase;
 use mongodb::{bson::Document, bson::doc};
-use std::borrow::Borrow;
 use buddet_core::user::user::User;
 use buddet_core::user::user_repository::UserRepository;
+use async_trait::async_trait;
 
 pub struct MongoUserRepository;
 
@@ -23,9 +23,10 @@ impl MongoUserRepository {
     }
 }
 
-impl UserRepository<MongoDatabase> for MongoUserRepository {
-    fn save(&self, persistence: &MongoDatabase, user: User) -> Result<String, &str> {
-        match persistence.upsert(MongoUserRepository::COLLECTION_NAME, MongoUserRepository::convert_to_doc(user)) {
+#[async_trait]
+impl<'a> UserRepository<'a, MongoDatabase> for MongoUserRepository {
+    async fn save(&'a self, persistence: &MongoDatabase, user: User) -> Result<String, &'a str> {
+        match persistence.upsert(MongoUserRepository::COLLECTION_NAME, MongoUserRepository::convert_to_doc(user)).await {
             Ok(it) => Ok(it.inserted_id.to_string()),
             Err(err) => {
                 println!("Error: {}", err.to_string());
@@ -34,7 +35,7 @@ impl UserRepository<MongoDatabase> for MongoUserRepository {
         }
     }
 
-    fn find(&self, persistence: &MongoDatabase, id: &str) -> Result<User, &str> {
+    async fn find(&'a self, persistence: &MongoDatabase, id: &str) -> Result<User, &'a str> {
         unimplemented!()
     }
 }

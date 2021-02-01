@@ -13,9 +13,14 @@ async fn main() {
     println!("user: {}", new_user);
     println!("user: {}", user);
 
-    let mdb = MongoDatabase::new("mongodb://admin:password@localhost:27022/buddetdb", "buddetdb").unwrap();
-    let mur = MongoUserRepository::new();
-    println!("ID: {}", mur.save(&mdb, user).unwrap());
+    if let Ok(mdb) = MongoDatabase::new("mongodb://admin:password@localhost:27022/buddetdb", "buddetdb").await {
+        let mur = MongoUserRepository::new();
+        let result = mur.save(&mdb, user).await;
+        match result {
+            Ok(inserted) => println!("ID: {}", inserted),
+            Err(err) => println!("Error: {}", err.to_string())
+        }
+    }
 
     let hello = warp::path!("hello" / String)
         .map(|name| format!("Hello, {}!", name));
