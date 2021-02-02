@@ -3,6 +3,8 @@ use mongodb::{bson::Document, bson::doc};
 use buddet_core::user::user::User;
 use buddet_core::user::user_repository::UserRepository;
 use async_trait::async_trait;
+use buddet_core::error::repository_error::RepositoryErrorKind;
+use buddet_core::error::repository_error::RepositoryErrorKind::SaveErr;
 
 pub struct MongoUserRepository;
 
@@ -24,18 +26,15 @@ impl MongoUserRepository {
 }
 
 #[async_trait]
-impl<'a> UserRepository<'a, MongoDatabase> for MongoUserRepository {
-    async fn save(&'a self, persistence: &MongoDatabase, user: User) -> Result<String, &'a str> {
+impl UserRepository<MongoDatabase> for MongoUserRepository {
+    async fn save(&self, persistence: &MongoDatabase, user: User) -> Result<String, RepositoryErrorKind> {
         match persistence.upsert(MongoUserRepository::COLLECTION_NAME, MongoUserRepository::convert_to_doc(user)).await {
             Ok(it) => Ok(it.inserted_id.to_string()),
-            Err(err) => {
-                println!("Error: {}", err.to_string());
-                return Err("Error");
-            }
+            Err(err) => Err(SaveErr(err.to_string()))
         }
     }
 
-    async fn find(&'a self, persistence: &MongoDatabase, id: &str) -> Result<User, &'a str> {
+    async fn find(&self, persistence: &MongoDatabase, id: &str) -> Option<User> {
         unimplemented!()
     }
 }

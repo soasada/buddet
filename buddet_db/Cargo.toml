@@ -7,4 +7,4 @@ edition = "2018"
 [dependencies]
 buddet_core = { path = "../buddet_core", version = "0.1.0" }
 async-trait = "0.1"
-mongodb = "1.1.1"
+mongodb = "2.0.0-alpha"
