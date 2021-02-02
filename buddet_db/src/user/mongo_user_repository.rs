@@ -3,8 +3,8 @@ use mongodb::{bson::Document, bson::doc};
 use buddet_core::user::user::User;
 use buddet_core::user::user_repository::UserRepository;
 use async_trait::async_trait;
-use buddet_core::error::repository_error::RepositoryErrorKind;
-use buddet_core::error::repository_error::RepositoryErrorKind::SaveErr;
+use buddet_core::repository::repository_error::RepositoryErrorKind;
+use buddet_core::repository::repository_error::RepositoryErrorKind::SaveErr;
 
 pub struct MongoUserRepository;
 
