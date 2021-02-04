@@ -1,9 +1,10 @@
 use warp::Filter;
 use buddet_db::database::mongo_database::MongoDatabase;
-use buddet_db::user::mongo_user_repository::MongoUserRepository;
-use buddet_core::user::user::User;
-use buddet_core::user::user_repository::UserRepository;
+use buddet_core::user::User;
 use crate::user::create_user_request::CreateUserRequest;
+use buddet_db::database::{save, find};
+use buddet_db::database::entity::Entity;
+use buddet_db::user::UserEntity;
 
 mod user;
 
@@ -12,10 +13,13 @@ async fn main() {
     let user = User::new("John", "Smith", "test@example.org", "p4ssw0rd");
 
     if let Ok(mdb) = MongoDatabase::new("mongodb://admin:password@localhost:27022/buddetdb", "buddetdb").await {
-        let mur = MongoUserRepository::new();
-        let result = mur.save(&mdb, user).await;
+        let result = save(&mdb, UserEntity::from(user)).await;
         match result {
-            Ok(inserted) => println!("ID: {}", inserted),
+            Ok(inserted) => {
+                if let Some(foundUser) = find(&mdb, UserEntity::collection(), inserted.as_str(), UserEntity::convert_to_entity).await {
+                    println!("user: {}", foundUser);
+                }
+            }
             Err(err) => println!("{}", err.to_string())
         }
 

@@ -1,7 +1,5 @@
 use std::fmt::{Display, Formatter, Result};
 
-pub mod user_repository;
-
 pub struct User {
     pub firstname: String,
     pub lastname: String,

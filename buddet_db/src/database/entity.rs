@@ -1,7 +1,9 @@
 use mongodb::bson::Document;
 
 pub trait Entity {
-    fn collection(&self) -> &str;
-    fn convert_to_doc<T>(entity: T) -> Document;
-    fn convert_to_entity<T>(document: Document) -> T;
+    type ToEntity;
+
+    fn collection() -> &'static str;
+    fn convert_to_doc(&self) -> Document;
+    fn convert_to_entity(document: Document) -> Self::ToEntity;
 }
