@@ -30,10 +30,10 @@ impl User {
 impl Display for User {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{{ \
-        \"firstname\": \"{}\", \
-        \"lastname\": \"{}\", \
-        \"email\": \"{}\", \
-        \"password\": \"{}\" \
+        \"firstname\": {}, \
+        \"lastname\": {}, \
+        \"email\": {}, \
+        \"password\": {} \
         }}", self.firstname, self.lastname, self.email, self.password)
     }
 }

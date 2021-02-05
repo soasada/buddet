@@ -1,6 +1,6 @@
 use mongodb::{
     options::{ClientOptions, FindOneOptions},
-    bson::{Document, doc},
+    bson::{Document, doc, oid::ObjectId},
     Client, error::Result, results::InsertOneResult,
 };
 
@@ -33,7 +33,7 @@ impl MongoDatabase {
             .await
     }
 
-    pub async fn find(&self, collection_name: &str, id: &str) -> Option<Document> {
+    pub async fn find(&self, collection_name: &str, id: &ObjectId) -> Option<Document> {
         let filter = doc! { "_id": id };
         let find_options = FindOneOptions::default();
         let result = self.client

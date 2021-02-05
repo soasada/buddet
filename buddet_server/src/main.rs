@@ -10,14 +10,14 @@ mod user;
 
 #[tokio::main]
 async fn main() {
-    let user = User::new("John", "Smith", "test@example.org", "p4ssw0rd");
+    let user = User::new("John", "Smith", "test1111@example.org", "p4ssw0rd");
 
     if let Ok(mdb) = MongoDatabase::new("mongodb://admin:password@localhost:27022/buddetdb", "buddetdb").await {
         let result = save(&mdb, UserEntity::from(user)).await;
         match result {
             Ok(inserted) => {
-                if let Some(foundUser) = find(&mdb, UserEntity::collection(), inserted.as_str(), UserEntity::convert_to_entity).await {
-                    println!("user: {}", foundUser);
+                if let Some(found_user) = find(&mdb, UserEntity::collection(), inserted.as_object_id().unwrap(), UserEntity::convert_to_entity).await {
+                    println!("user: {}", found_user);
                 }
             }
             Err(err) => println!("{}", err.to_string())

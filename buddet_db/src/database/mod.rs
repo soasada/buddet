@@ -2,7 +2,7 @@ use crate::database::mongo_database::MongoDatabase;
 use crate::database::entity::Entity;
 use buddet_core::repository::repository_error::{RepositoryErrorKind, RepositoryErrorKind::SaveErr};
 use mongodb::{
-    bson::{Document, Bson}
+    bson::{Document, Bson, oid::ObjectId}
 };
 
 pub mod entity;
@@ -15,7 +15,7 @@ pub async fn save<T: Entity>(mongo_db: &MongoDatabase, entity: T) -> std::result
     }
 }
 
-pub async fn find<T>(mongo_db: &MongoDatabase, collection_name: &str, id: &str, conversion: fn(Document) -> T) -> Option<T> {
+pub async fn find<T>(mongo_db: &MongoDatabase, collection_name: &str, id: &ObjectId, conversion: fn(Document) -> T) -> Option<T> {
     match mongo_db.find(collection_name, id).await {
         Some(document) => Some(conversion(document)),
         _ => None
