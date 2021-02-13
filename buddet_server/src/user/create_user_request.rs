@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use warp::Filter;
+use std::fmt::{Display, Formatter, Result};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateUserRequest {
@@ -9,3 +9,13 @@ pub struct CreateUserRequest {
     pub password: String,
 }
 
+impl Display for CreateUserRequest {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "{{ \
+        \"firstname\": {}, \
+        \"lastname\": {}, \
+        \"email\": {}, \
+        \"password\": {} \
+        }}", self.firstname, self.lastname, self.email, self.password)
+    }
+}

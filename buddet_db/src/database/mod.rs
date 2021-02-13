@@ -8,7 +8,7 @@ use mongodb::{
 pub mod entity;
 pub mod mongo_database;
 
-pub async fn save<T: Entity>(mongo_db: &MongoDatabase, entity: T) -> std::result::Result<Bson, RepositoryErrorKind> {
+pub async fn save<T: Entity>(mongo_db: &MongoDatabase, entity: T) -> Result<Bson, RepositoryErrorKind> {
     match mongo_db.upsert(T::collection(), entity.convert_to_doc()).await {
         Ok(it) => Ok(it.inserted_id),
         Err(err) => Err(SaveErr(err.to_string()))

@@ -1,4 +1,4 @@
-use warp::Filter;
+use warp::{Filter, Rejection, http::Response};
 use buddet_db::database::mongo_database::MongoDatabase;
 use buddet_core::user::User;
 use crate::user::create_user_request::CreateUserRequest;
@@ -23,7 +23,15 @@ async fn main() {
             Err(err) => println!("{}", err.to_string())
         }
 
-        // POST /employees/:rate  {"name":"Sean","rate":2}
+        use warp::{body, get, path, path::end, post};
+
+        let POST = |desired_path: &str, func: fn(_) -> Result<Response, Rejection>| post().and(path(desired_path)).and(body::content_length_limit(1024 * 16)).and(body::json()).and_then(func);
+
+        let routes = warp::any()
+            // POST /register
+            .or(POST("register", register));
+
+
         /*let create_user = warp::post()
             .and(warp::path("users"))
             .and(warp::body::content_length_limit(1024 * 16))
@@ -41,4 +49,9 @@ async fn main() {
             .run(([127, 0, 0, 1], 3030))
             .await;
     }
+}
+
+async fn register(request: CreateUserRequest) -> Result<Response, Rejection> {
+    println!("Incoming request {}", request);
+    return Ok(Response::builder().header("asd", "asd").body(""));
 }
