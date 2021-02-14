@@ -22,7 +22,7 @@ pub async fn save<T: Entity>(db: Database, entity: T) -> Result<Bson, Repository
 
 pub async fn find<T>(db: Database,
                      collection_name: &str,
-                     id: &ObjectId,
+                     id: ObjectId,
                      conversion: fn(Document) -> T) -> Option<T> {
     let filter = doc! { "_id": id };
     let find_options = FindOneOptions::default();

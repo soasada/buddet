@@ -23,9 +23,9 @@ async fn main() {
 }
 
 mod filters {
-    use super::user::register_handler;
+    use super::user::{register_handler, find_user};
     use warp::{Filter, body};
-    use mongodb::Database;
+    use mongodb::{Database, bson::oid::ObjectId};
 
     pub fn new(db: Database) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
         register(db)
@@ -38,6 +38,13 @@ mod filters {
             .and(body::json())
             .and(with_db(db))
             .and_then(register_handler)
+    }
+
+    pub fn find_u(db: Database) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+        warp::path("users" / ObjectId { id: val })
+            .and(warp::get())
+            .and(with_db(db))
+            .and_then(find_user)
     }
 
     fn with_db(db: Database) -> impl Filter<Extract=(Database, ), Error=std::convert::Infallible> + Clone {
