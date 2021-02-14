@@ -1,60 +1,46 @@
-use buddet_db::database::mongo_database::MongoDatabase;
+use mongodb::{options::ClientOptions, Client};
 
 mod user;
 
 #[tokio::main]
 async fn main() {
-    if let Ok(mdb) = MongoDatabase::new("mongodb://admin:password@localhost:27022/buddetdb", "buddetdb").await {
-        let api = filters::new(&mdb);
-        warp::serve(api)
-            .run(([127, 0, 0, 1], 3030))
-            .await;
+    match ClientOptions::parse("mongodb://admin:password@localhost:27022").await {
+        Ok(client_options) => {
+            match Client::with_options(client_options) {
+                Ok(mongo_client) => {
+                    let db = mongo_client.database("buddetdb");
+                    let api = filters::new(db);
+
+                    warp::serve(api)
+                        .run(([127, 0, 0, 1], 3030))
+                        .await;
+                }
+                Err(err) => println!("{}", err.to_string())
+            }
+        }
+        Err(err) => println!("{}", err.to_string())
     }
 }
 
 mod filters {
-    use super::handlers;
-    use buddet_db::database::mongo_database::MongoDatabase;
+    use super::user::register_handler;
     use warp::{Filter, body};
+    use mongodb::Database;
 
-    pub fn new<'a>(db: &'a MongoDatabase) -> impl Filter<Extract = impl warp::Reply + 'a, Error=warp::Rejection> + Clone {
-        register(db.clone())
+    pub fn new(db: Database) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+        register(db)
     }
 
-    pub fn register<'a>(db: &'a MongoDatabase) -> impl Filter<Extract = impl warp::Reply + 'a, Error = warp::Rejection> + Clone {
+    pub fn register(db: Database) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
         warp::path("register")
             .and(warp::post())
             .and(body::content_length_limit(1024 * 16))
             .and(body::json())
             .and(with_db(db))
-            .and_then(handlers::register_handler)
+            .and_then(register_handler)
     }
 
-    fn with_db<'a>(db: &'a MongoDatabase) -> impl Filter<Extract = (&'a MongoDatabase,), Error = std::convert::Infallible> + Clone {
+    fn with_db(db: Database) -> impl Filter<Extract=(Database, ), Error=std::convert::Infallible> + Clone {
         warp::any().map(move || db.clone())
-    }
-}
-
-mod handlers {
-    use crate::user::create_user_request::CreateUserRequest;
-    use buddet_db::database::mongo_database::MongoDatabase;
-    use std::convert::Infallible;
-    use buddet_core::user::User;
-    use buddet_db::database::save;
-    use buddet_db::user::UserEntity;
-    use warp::http::StatusCode;
-
-    pub async fn register_handler(request: CreateUserRequest, db: &MongoDatabase) -> Result<impl warp::Reply, Infallible> {
-        let user = User::new(
-            request.firstname.as_str(),
-            request.lastname.as_str(),
-            request.email.as_str(),
-            request.password.as_str()
-        );
-        if let Ok(inserted) = save(db, UserEntity::from(user)).await {
-            Ok(StatusCode::CREATED)
-        } else {
-            Ok(StatusCode::BAD_REQUEST)
-        }
     }
 }

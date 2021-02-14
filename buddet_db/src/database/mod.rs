@@ -1,24 +1,42 @@
-use crate::database::mongo_database::MongoDatabase;
 use crate::database::entity::Entity;
 use buddet_core::repository::repository_error::{RepositoryErrorKind, RepositoryErrorKind::SaveErr};
 use mongodb::{
-    bson::{Document, Bson, oid::ObjectId}
+    bson::{Document, Bson, doc, oid::ObjectId},
+    Database,
+    options::FindOneOptions,
 };
 
 pub mod entity;
-pub mod mongo_database;
 
-pub async fn save<T: Entity>(mongo_db: &MongoDatabase, entity: T) -> Result<Bson, RepositoryErrorKind> {
-    match mongo_db.upsert(T::collection(), entity.convert_to_doc()).await {
+pub async fn save<T: Entity>(db: Database, entity: T) -> Result<Bson, RepositoryErrorKind> {
+    let result = db
+        .collection(T::collection())
+        .insert_one(entity.convert_to_doc(), None)
+        .await;
+
+    match result {
         Ok(it) => Ok(it.inserted_id),
         Err(err) => Err(SaveErr(err.to_string()))
     }
 }
 
-pub async fn find<T>(mongo_db: &MongoDatabase, collection_name: &str, id: &ObjectId, conversion: fn(Document) -> T) -> Option<T> {
-    match mongo_db.find(collection_name, id).await {
-        Some(document) => Some(conversion(document)),
-        _ => None
+pub async fn find<T>(db: Database,
+                     collection_name: &str,
+                     id: &ObjectId,
+                     conversion: fn(Document) -> T) -> Option<T> {
+    let filter = doc! { "_id": id };
+    let find_options = FindOneOptions::default();
+    let result = db
+        .collection(collection_name)
+        .find_one(filter, find_options)
+        .await;
+
+    match result {
+        Ok(document) => Some(conversion(document.unwrap())),
+        Err(e) => {
+            println!("{}", e.to_string());
+            return Option::None;
+        }
     }
 }
 
