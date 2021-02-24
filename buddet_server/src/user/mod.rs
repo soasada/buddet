@@ -10,8 +10,6 @@ use mongodb::{
     bson::oid::ObjectId,
 };
 
-mod user_payload;
-
 pub async fn register_handler(request: CreateUserRequest, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
     let user = User::new(
         request.firstname.as_str(),
