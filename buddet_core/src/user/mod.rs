@@ -1,7 +1,9 @@
 use serde::{Serialize, Deserialize};
+use entity_derive::entity_derive;
+use entity::entity::Entity;
 use std::fmt::{Display, Formatter, Result};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Entity)]
 pub struct User {
     #[serde(default = "default_id")]
     pub _id: String,

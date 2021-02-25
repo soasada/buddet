@@ -1,4 +1,4 @@
-use mongodb::{
+/*use mongodb::{
     bson::{Document, doc, oid::ObjectId}
 };
 use crate::database::entity::Entity;
@@ -49,4 +49,4 @@ impl Entity for UserEntity {
             password: document.get("password").unwrap().to_string(),
         }
     }
-}
+}*/

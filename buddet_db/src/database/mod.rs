@@ -1,12 +1,10 @@
-use crate::database::entity::Entity;
+use entity::entity::Entity;
 use buddet_core::repository::repository_error::{RepositoryErrorKind, RepositoryErrorKind::SaveErr};
 use mongodb::{
     bson::{Document, Bson, doc, oid::ObjectId},
     Database,
     options::FindOneOptions,
 };
-
-pub mod entity;
 
 pub async fn save<T: Entity>(db: Database, entity: T) -> Result<Bson, RepositoryErrorKind> {
     let result = db

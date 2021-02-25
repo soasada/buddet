@@ -1,16 +1,14 @@
-use crate::user::user_payload::{CreateUserRequest, UserCreationResponse, UserResponse};
 use std::convert::Infallible;
 use buddet_core::user::User;
 use buddet_db::database::{save, find};
-use buddet_db::database::entity::Entity;
-use buddet_db::user::UserEntity;
+use entity::entity::Entity;
 use warp::http::StatusCode;
 use mongodb::{
     Database,
     bson::oid::ObjectId,
 };
 
-pub async fn register_handler(request: CreateUserRequest, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
+pub async fn register_handler(request: User, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
     let user = User::new(
         request.firstname.as_str(),
         request.lastname.as_str(),
@@ -18,11 +16,9 @@ pub async fn register_handler(request: CreateUserRequest, db: Database) -> Resul
         request.password.as_str(),
     );
 
-    match save(db, UserEntity::from(user)).await {
+    match save(db, request).await {
         Ok(inserted) => {
-            let response = UserCreationResponse {
-                id: inserted.as_object_id().unwrap().to_hex()
-            };
+            let response = request.with_id(inserted.as_object_id().unwrap().to_hex().as_str());
             Ok(Box::new(warp::reply::json(&response)))
         }
         Err(err) => {
@@ -33,9 +29,9 @@ pub async fn register_handler(request: CreateUserRequest, db: Database) -> Resul
 
 pub async fn find_user(id: String, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
     if let Ok(oid) = ObjectId::with_string(id.as_str()) {
-        match find(db, "user", oid, UserEntity::convert_to_entity).await {
+        match find(db, "user", oid, User::convert_to_entity).await {
             Some(user) => {
-                Ok(Box::new(warp::reply::json(&UserResponse::new(id, user))))
+                Ok(Box::new(warp::reply::json(&user)))
             },
             None => Ok(Box::new(StatusCode::NOT_FOUND))
         }

@@ -6,4 +6,5 @@ edition = "2018"
 
 [dependencies]
 buddet_core = { path = "../buddet_core", version = "0.1.0" }
+entity = { path = "../entity", version = "0.1.0" }
 mongodb = "2.0.0-alpha"

@@ -1,2 +1,2 @@
 [workspace]
-members = ["buddet_core", "buddet_db", "buddet_server", "buddet_db/entity", "buddet_db/entity_derive"]
+members = ["buddet_core", "buddet_db", "buddet_server", "entity", "entity_derive"]
