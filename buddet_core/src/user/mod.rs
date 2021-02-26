@@ -1,9 +1,10 @@
 use serde::{Serialize, Deserialize};
-use entity_derive::entity_derive;
+use entity_derive::Entity;
 use entity::entity::Entity;
+use mongodb::{bson::{Document, doc}};
 use std::fmt::{Display, Formatter, Result};
 
-#[derive(Serialize, Deserialize, Debug, Entity)]
+#[derive(Serialize, Deserialize, Debug, Entity, Clone)]
 pub struct User {
     #[serde(default = "default_id")]
     pub _id: String,

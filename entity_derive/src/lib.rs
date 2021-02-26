@@ -23,17 +23,27 @@ fn impl_entity(ast: &syn::DeriveInput) -> TokenStream {
         _ => panic!("This derive can only be used on structs"),
     };
 
+    let collection_name = name.to_string().to_lowercase();
+
     let gen = quote! {
-      use mongodb::{bson::{Document, doc}};
       impl Entity for #name {
+        type ToEntity = #name;
         fn collection() -> &'static str {
-          stringify!(#name).to_lowercase().as_str()
+          #collection_name
         }
         fn convert_to_doc(&self) -> Document {
-          return
+          doc! {
+            "_id": "hola"
+          }
         }
         fn convert_to_entity(document: Document) -> Self::ToEntity {
-
+          User {
+            _id: document.get("_id").unwrap().to_string(),
+            firstname: document.get("firstname").unwrap().to_string(),
+            lastname: document.get("lastname").unwrap().to_string(),
+            email: document.get("email").unwrap().to_string(),
+            password: document.get("password").unwrap().to_string(),
+          }
         }
       }
     };

@@ -9,14 +9,7 @@ use mongodb::{
 };
 
 pub async fn register_handler(request: User, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
-    let user = User::new(
-        request.firstname.as_str(),
-        request.lastname.as_str(),
-        request.email.as_str(),
-        request.password.as_str(),
-    );
-
-    match save(db, request).await {
+    match save(db, request.clone()).await {
         Ok(inserted) => {
             let response = request.with_id(inserted.as_object_id().unwrap().to_hex().as_str());
             Ok(Box::new(warp::reply::json(&response)))
