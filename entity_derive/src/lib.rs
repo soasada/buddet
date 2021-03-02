@@ -24,6 +24,17 @@ fn impl_entity(ast: &syn::DeriveInput) -> TokenStream {
     };
 
     let collection_name = name.to_string().to_lowercase();
+    let attributes = struct_data.fields.iter()
+        .filter(|f| f.ident.is_some())
+        .map(|f| f.ident.as_ref().unwrap())
+        .collect::<Vec<_>>();
+
+    let vec = attributes.iter()
+        .map(|f| quote!(stringify!(#f): self.#f.clone()))
+        .collect::<Vec<_>>();
+    let vec1 = attributes.iter()
+        .map(|f| quote!(#f: document.get(stringify!(#f)).unwrap().to_string()))
+        .collect::<Vec<_>>();
 
     let gen = quote! {
       impl Entity for #name {
@@ -33,16 +44,12 @@ fn impl_entity(ast: &syn::DeriveInput) -> TokenStream {
         }
         fn convert_to_doc(&self) -> Document {
           doc! {
-            "_id": "hola"
+            #(#vec),*
           }
         }
         fn convert_to_entity(document: Document) -> Self::ToEntity {
-          User {
-            _id: document.get("_id").unwrap().to_string(),
-            firstname: document.get("firstname").unwrap().to_string(),
-            lastname: document.get("lastname").unwrap().to_string(),
-            email: document.get("email").unwrap().to_string(),
-            password: document.get("password").unwrap().to_string(),
+          #name {
+            #(#vec1),*
           }
         }
       }
