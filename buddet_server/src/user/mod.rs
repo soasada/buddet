@@ -11,7 +11,7 @@ use mongodb::{
 pub async fn register_handler(request: User, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
     match save(db, request.clone()).await {
         Ok(inserted) => {
-            let response = request.with_id(inserted.as_object_id().unwrap().to_hex().as_str());
+            let response = request.with_id(inserted.as_object_id().unwrap().clone());
             Ok(Box::new(warp::reply::json(&response)))
         }
         Err(err) => {
