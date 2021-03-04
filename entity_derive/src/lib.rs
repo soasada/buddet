@@ -3,10 +3,6 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn;
-use std::any::{Any, TypeId};
-use mongodb::{
-    bson::{oid::ObjectId}
-};
 
 #[proc_macro_derive(Entity)]
 pub fn entity_derive(input: TokenStream) -> TokenStream {
@@ -36,17 +32,6 @@ fn impl_entity(ast: &syn::DeriveInput) -> TokenStream {
     let vec = attributes.iter()
         .map(|f| quote!(stringify!(#f): self.#f.clone()))
         .collect::<Vec<_>>();
-    let vec1 = attributes.iter()
-        .map(|f|
-            if is_object_id(*f) {
-                println!("Yes");
-                quote!(#f: document.get(stringify!(#f)).as_object_id().unwrap())
-            } else {
-                println!("No");
-                quote!(#f: document.get(stringify!(#f)).unwrap().to_string())
-            }
-        )
-        .collect::<Vec<_>>();
 
     let gen = quote! {
       impl Entity for #name {
@@ -59,17 +44,8 @@ fn impl_entity(ast: &syn::DeriveInput) -> TokenStream {
             #(#vec),*
           }
         }
-        fn convert_to_entity(document: Document) -> Self::ToEntity {
-          #name {
-            #(#vec1),*
-          }
-        }
       }
     };
 
     gen.into()
-}
-
-fn is_object_id(s: &dyn Any) -> bool {
-    TypeId::of::<ObjectId>() == s.type_id()
 }

@@ -6,7 +6,7 @@ use std::fmt::{Display, Formatter, Result};
 
 #[derive(Serialize, Deserialize, Debug, Entity, Clone)]
 pub struct User {
-    pub _id: Option<ObjectId>,
+    pub _id: ObjectId,
     pub firstname: String,
     pub lastname: String,
     pub email: String,
@@ -16,7 +16,7 @@ pub struct User {
 impl User {
     pub fn new(firstname: &str, lastname: &str, email: &str, password: &str) -> User {
         User {
-            _id: None,
+            _id: ObjectId::new(),
             firstname: String::from(firstname),
             lastname: String::from(lastname),
             email: String::from(email),
@@ -26,7 +26,7 @@ impl User {
 
     pub fn with_id(&self, _id: ObjectId) -> User {
         User {
-            _id: Some(_id),
+            _id: _id,
             firstname: self.firstname.clone(),
             lastname: self.lastname.clone(),
             email: self.email.clone(),

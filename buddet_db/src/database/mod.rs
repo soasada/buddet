@@ -1,15 +1,16 @@
 use entity::entity::Entity;
 use buddet_core::repository::repository_error::{RepositoryErrorKind, RepositoryErrorKind::SaveErr};
 use mongodb::{
-    bson::{Document, Bson, doc, oid::ObjectId},
+    bson::{Document, Bson, doc, oid::ObjectId, to_document},
     Database,
     options::FindOneOptions,
 };
+use serde::{Serialize};
 
-pub async fn save<T: Entity>(db: Database, entity: T) -> Result<Bson, RepositoryErrorKind> {
+pub async fn save<T: Serialize>(db: Database, entity: T) -> Result<Bson, RepositoryErrorKind> {
     let result = db
-        .collection(T::collection())
-        .insert_one(entity.convert_to_doc(), None)
+        .collection("user")
+        .insert_one(to_document(&entity).unwrap(), None)
         .await;
 
     match result {

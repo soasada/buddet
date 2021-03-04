@@ -5,7 +5,7 @@ use entity::entity::Entity;
 use warp::http::StatusCode;
 use mongodb::{
     Database,
-    bson::oid::ObjectId,
+    bson::{oid::ObjectId, from_document, Bson},
 };
 
 pub async fn register_handler(request: User, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
@@ -22,9 +22,9 @@ pub async fn register_handler(request: User, db: Database) -> Result<Box<dyn war
 
 pub async fn find_user(id: String, db: Database) -> Result<Box<dyn warp::Reply>, Infallible> {
     if let Ok(oid) = ObjectId::with_string(id.as_str()) {
-        match find(db, "user", oid, User::convert_to_entity).await {
+        match find(db, "user", oid, |d| from_document::<User>(d)).await {
             Some(user) => {
-                Ok(Box::new(warp::reply::json(&user)))
+                Ok(Box::new(warp::reply::json(&user.unwrap())))
             },
             None => Ok(Box::new(StatusCode::NOT_FOUND))
         }
